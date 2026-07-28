@@ -1,4 +1,4 @@
-﻿#!/usr/bin/env python3
+#!/usr/bin/env python3
 """三页确定性烟测：页序、真实图标、禁图、后处理与原生 DrawingML 导出必须可用。"""
 
 import subprocess
@@ -39,6 +39,29 @@ def main() -> int:
                 f'{body}</svg>',
                 encoding="utf-8",
             )
+        (project / "spec_lock.md").write_text(
+            "# Smoke test spec lock\n"
+            "\n"
+            "## canvas\n\n- viewBox: 0 0 1280 720\n- width: 1280\n- height: 720\n\n## pptx_structure\n"
+            "\n"
+            "- mode: flat\n"
+            "\n"
+            "## typography\n"
+            "\n"
+            "- font_family: Microsoft YaHei, Arial, sans-serif\n"
+            "- title_family: Cambria, SimSun, serif\n"
+            "- body_family: Microsoft YaHei, Arial, sans-serif\n"
+            "- title: 52\n"
+            "- body: 32\n"
+            "\n"
+            "## colors\n"
+            "\n"
+            "- background: #FFFFFF\n"
+            "- primary: #315B7D\n"
+            "- accent: #C8553D\n"
+            "- body_text: #24313A\n",
+            encoding="utf-8",
+        )
         subprocess.run(
             [sys.executable, str(scripts_dir / "finalize_svg.py"), str(project)],
             check=True,
@@ -60,8 +83,8 @@ def main() -> int:
                 str(project),
                 "-o",
                 str(pptx),
-                "--only",
-                "native",
+                "--pptx-structure",
+                "flat",
                 "--no-notes",
                 "-t",
                 "none",
