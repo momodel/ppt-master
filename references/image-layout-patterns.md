@@ -78,7 +78,7 @@ This is the family that opens up the largest design space and the one AI is most
 
 42. **Background image + glassmorphism UI panels** — image is the visual world; on top, draw UI elements (semi-transparent panels, progress arcs, status badges, indicators). Panels use `fill-opacity="0.6–0.8"` + thin light-color strokes; arcs via `<path d="…A…">`. Looks like a live dashboard floating above the scene.
 
-43. **Teacher image + native data chart on top** — when a downloaded source image provides useful context, keep it as reference scenery and draw the accurate chart with native SVG primitives (`<line>` axes, `<path>` series, `<circle>` data points) directly on or next to it. Required marker if exporting: `<!-- chart-plot-area: x_min,y_min,x_max,y_max -->` inside the chart group.
+43. **Background image + native data chart on top** — AI image generation cannot produce accurate data charts. Solution: use an AI-generated dashboard image as **visual reference only** (clearly labeled as such in a caption), and draw the actual chart with native SVG primitives (`<line>` axes, `<path>` series, `<circle>` data points) directly on or next to it. Required marker if exporting: `<!-- chart-plot-area: x_min,y_min,x_max,y_max -->` inside the chart group.
 
 44. **Background image + native network/architecture diagram** — same logic as #43 but for structural diagrams. Image provides atmosphere or visual anchor; the actual nodes, connections, and labels are SVG circles, lines, icons, and text — all editable.
 
@@ -148,7 +148,7 @@ Stack any of these freely on top of a Primary structure. Multiple Modifiers per 
 
 24. **Custom path crop (blob, arrow, leaf, silhouette)** — `<clipPath><path d="…"/></clipPath>`; allows any curved or organic shape. PowerPoint export translates this to `custGeom` and survives roundtrip.
 
-25. **Layered paper-cut stack** — multiple image or shape layers each with `clipPath` + a small `<feDropShadow>` offset to fake physical layering depth. Each layer casts a shadow onto the next, producing real-looking craft depth.
+25. **Layered paper-cut stack** — clip each image layer under the image-only contract in [`shared-standards-core.md`](./shared-standards-core.md) §1.2; draw vector layers directly in their final geometry. A small conditional shadow on each layer can create physical separation.
 
 26. **Triptych baked into a single wide image** — one wide `<image width=1160 height=334>` whose internal composition already contains 2–3 scenes. Generate the triptych as one image (not three separate calls) when scene-to-scene consistency matters — the model preserves character identity, lighting continuity, and color grading far more reliably when panels are produced together.
 
@@ -166,17 +166,17 @@ Stack any of these freely on top of a Primary structure. Multiple Modifiers per 
 
 31. **Color-tinted overlay** — `<rect fill="#brandColor" fill-opacity="0.15–0.25"/>`. Pushes a foreign-looking image toward the deck's palette without regenerating it.
 
-32. **Multi-stop scrim with hue shift** — three-or-more-stop `<linearGradient>` where stops are different colors (e.g. dark navy → transparent → warm orange). This visually integrates a teacher source image whose color temperature differs from the deck without modifying the original file.
+32. **Multi-stop scrim with hue shift** — three-or-more-stop `<linearGradient>` where stops are different colors (e.g. dark navy → transparent → warm orange). This re-grades the image's color world without regenerating — particularly useful when an AI image came back with the right composition but wrong color temperature.
 
 33. **Spotlight mask — clear region surrounded by darkness** — cover the canvas with `<rect>` filled by a `<radialGradient>` whose inner stop is fully transparent and outer stop is opaque dark. Reads as a flashlight beam on the focal area. Use sparingly — it kills everything outside the spotlight.
 
-34. **Gaussian-blur backdrop** — `<filter><feGaussianBlur stdDeviation="8–15"/></filter>` applied to the background image, with sharp content layered on top unblurred. Reads as depth-of-field. Be aware that filters have inconsistent PPT export support — if fidelity matters, bake the blur into the source image instead.
+34. **Gaussian-blur backdrop** — blur the background in the source image, then layer sharp SVG content above it. Native filter export maps the supported blur graph to a glow/shadow effect; it does not preserve a blurred-image backdrop.
 
-35. **Duotone treatment** — two-color mapping of a photograph (e.g. deep navy shadows + warm cream highlights). Most reliable when baked into the source image at generation time. Runtime SVG duotone via `<feColorMatrix>` + `<feComponentTransfer>` is possible but the filter chain is fragile through PPT export — only attempt if you control the renderer.
+35. **Duotone treatment** — two-color mapping of a photograph (e.g. deep navy shadows + warm cream highlights). Bake it into the source image; the native PPT route does not support a runtime duotone filter chain.
 
-36. **Drop shadow under image panel** — `<filter><feDropShadow dx dy stdDeviation flood-color flood-opacity/></filter>` applied to the image's container `<rect>` (or to the `<image>` itself). Standard depth lift.
+36. **Drop shadow under image panel** — `<filter><feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#000000" flood-opacity="0.10"/></filter>` applied to the image panel's backing `<rect>`. Standard depth lift; filters do not apply directly to `<image>` under the project contract.
 
-37. **Inner / outer glow on overlay shape** — `<filter><feGaussianBlur/><feMerge/></filter>` on a shape, or simply a slightly larger blurred `<rect>` underneath the target.
+37. **Inner / outer glow on overlay shape** — `<filter><feGaussianBlur stdDeviation="6"/><feMerge/></filter>` on a shape, or simply a slightly larger blurred `<rect>` underneath the target.
 
 ## Image as Texture / Atmosphere
 
@@ -194,9 +194,9 @@ Stack any of these freely on top of a Primary structure. Multiple Modifiers per 
 
 62. **Same image, two references — full view + zoom-callout** — reference the same image file twice in two `<image>` elements: one shows the full scene at normal size; the second uses `clipPath` (circle or rectangle) plus a larger display size to "zoom into" a sub-region. Connect them with a bezier `<path>` ending in `marker-end`; ring the zoom with a `<circle stroke>` so it reads as a magnifying lens. No special asset needed — the zoom effect comes from same-source-different-display.
 
-63. **Transparent PNG sticker / cutout** — a teacher-provided RGBA PNG placed via standard `<image>`; no `clipPath` is required because transparency lives in the file. It works best as an edge bleed, corner fragment, fade-out, slight rotation, or asymmetric collage rather than centered in a boxed tile.
+63. **Transparent PNG sticker / cutout** — an RGBA PNG (with alpha channel) placed via standard `<image>` — no `clipPath` required, the transparency lives in the file itself. Useful for subjects that should not appear inside a rectangular frame (people cutouts, product shots, decorative motifs floating over backgrounds). **Spot illustrations from the sheet→slice pipeline land here**: `slice_images.py --alpha` outputs transparent cutouts (see [image-generator.md](./image-generator.md) §4.3), so a sliced element is a ready sticker — never box it in a rectangle. Other sources of transparent PNGs: (a) an AI backend with native transparent output, (b) a chroma-key image stripped separately, (c) a user-supplied asset. A cutout begs for the decorative-placement family — combine with `#4` (bleed off the edge), `#58` (corner fragment), `#66` (fade into background), `#69` (slight rotation), or `#49` (asymmetric collage); the worst thing to do with a transparent spot is center it in a tidy box.
 
-64. **Teacher image with embedded text** — preserve embedded text only when it is part of the source figure and already correct. Anything that must be editable or newly added goes in the SVG `<text>` layer (#65).
+64. **Image with embedded text rendered by the AI** — text becomes part of the artwork: decorative lettering, designed title, hand-lettered keyword. Prompt with explicit text content — name the exact characters literally. Use for text that is part of the artwork and will not change. Anything that must be correct or editable goes in the SVG `<text>` layer (#65).
 
 65. **Image with NO text — labels added as native SVG** — generate the image with explicit "no text, no letters, no numbers, no signs" instruction (`text_policy: none`), then place all labels as `<text>` overlays. The right call when labels will be reworded, must stay exact, or carry data that must stay editable — pair with `#64` when stable visual identifiers (axis labels, subplot letters, unit symbols) belong inside the image instead.
 
@@ -204,7 +204,7 @@ Stack any of these freely on top of a Primary structure. Multiple Modifiers per 
 
 67. **Image with knock-out / cut-out shape** — overlay a shape filled with the background color or another image, creating the impression of a hole punched through the underlying image.
 
-68. **Text-as-mask over image** — letterforms revealing image through them. SVG-level `<mask>` is forbidden in this project (PPT export breaks). The only reliable way: bake this effect into the image at generation time by prompting for "large lettering revealing the underlying scene through letterforms." Treat as a pre-rendered artistic choice, not a runtime effect.
+68. **Text-as-mask over image** — letterforms revealing image through them. Under the canonical SVG compatibility boundary in [`shared-standards-core.md`](./shared-standards-core.md), realize this pattern as a pre-rendered image rather than a runtime effect. Prompt for "large lettering revealing the underlying scene through letterforms" and treat the result as a fixed artistic choice.
 
 69. **Image rotated at a slight angle for editorial feel** — `transform="rotate(angle cx cy)"` on the `<image>` or its container `<g>`; 2–6 degrees typical. Adds dynamism without breaking layout.
 
@@ -247,14 +247,15 @@ Combine freely. The "AI-default" failure mode is the opposite: defaulting to bar
 
 **Skip-detection signal** — if every page's `Layout pattern` column resolves to bare #2 / #3 / #5 / #6 with no Modifier ids, the catalog was not consulted. Re-read and reconsider.
 
-**Cross-page through-line (recurring motif).** The patterns above are per-page, but a deck reads as designed when one native-SVG motif, icon language, or coherent family of teacher-provided images recurs across the cover, section nodes, and selected body pages. Vary scale and placement; never turn recurrence into a quota.
+**Cross-page through-line (recurring motif).** The patterns above are per-page, but a deck reads as *designed* when one illustration motif family recurs across pages—a cover anchor, section dividers repeating the motif (`#75`), and small `#63` spots threaded through the body. Keep one family (shared rendering / locked deck colors / subject world), vary scale and placement, and never turn recurrence into a quota.
 
 ## Hard Constraints
 
 - Long body copy, data points, numeric labels, and Chinese text always go in the SVG layer — never baked into the image.
-- `<clipPath>` on `<image>` and transparency encoding (`fill-opacity` / `stop-opacity`, never `rgba()`) — authoritative form in [`shared-standards.md`](shared-standards.md) §1.2 and §2; do not restate or relax here.
-- No `<mask>`, no `<feComposite>` for alpha compositing. Alpha-effect routing (gradient overlays, clipPath crops, filter shadows, baked-in source image) is the table in [`shared-standards.md`](shared-standards.md) §1.0.
-- `<feDropShadow>` / `<feGaussianBlur>` are accepted but PPT export is inconsistent — bake into the source image when fidelity is critical.
+- Project-wide SVG compatibility rules start at [`shared-standards-core.md`](./shared-standards-core.md),
+  whose routing table names each conditional owner. This catalog neither
+  restates nor relaxes that contract; each pattern records only its
+  scenario-specific rendering choice.
 
 ---
 

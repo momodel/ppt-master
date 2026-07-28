@@ -1,152 +1,211 @@
-# {project_name} - Design Spec
+# Design Spec Structure
 
-> Human-readable design narrative. `spec_lock.md` is the machine-readable execution contract and wins if the two diverge.
-> The application has already obtained teacher approval for `confirmed_outline.md`; all design values below are chosen automatically by the model.
+Project-level `design_spec.md` is a human-readable English-heading Markdown artifact. This file owns its normal authoring structure. [`schemas/design_spec.schema.json`](./schemas/design_spec.schema.json) provides structural lint for readable sections and page projection; it is not an execution lock and does not require textual equality with `spec_lock.md`.
+
+Strategist reads the complete final confirmation once, writes this artifact from that retained state plus source analysis, and audits every confirmed field here. Afterward, `spec_lock.md` is authored from the completed Design Spec plus current project/page/template context; normal lock authoring never reopens `result.json`.
+
+## 1. Author the complete artifact
+
+After final confirmation, compose the entire document in active context from the retained final state, source analysis, and project context. Then create `<project_path>/design_spec.md` once, from the first line through §X.
+
+**Mandatory — new-project write**: The first non-empty line is exactly `<!-- ppt-master-schema: design-spec/v1 -->`, followed by `# <Project Name> - Design Spec`. Write every required section with final values and the complete page roster; include conditional §VII only when a real catalog reference is selected. Do not create a placeholder-bearing project file, copy example rows, or patch a scaffold field by field.
+
+`project_manager.py scaffold-spec` remains an optional manual convenience and overwrite-safe troubleshooting tool. It is not part of normal Generate authoring. Resume and refine paths edit an existing completed Design Spec rather than replacing it with a scaffold.
+
+---
+
+## 2. Exact document contract
+
+Angle-bracketed text below is authoring notation, not project content. Resolve every universal value before writing the file; omit only rows explicitly marked conditional. Keep every required `##` heading; omit §VII when no real catalog reference is selected, while §VIII remains present even with no data rows. Do not copy examples, notation tokens, or a second schema description into the project artifact.
+
+### 2.1 Header and project contract
+
+Start with this exact heading order:
+
+```markdown
+<!-- ppt-master-schema: design-spec/v1 -->
+# <Project Name> - Design Spec
 
 ## I. Project Information
 
 | Item | Value |
 | --- | --- |
-| Project Name | {project_name} |
-| Canvas Format | PPT 16:9, 1280 × 720 |
-| Page Count | [must equal confirmed outline] |
-| Target Audience | [derive from course material and outline] |
-| Use Case | Classroom teaching |
-| Content Boundary | Facts only from `sources/course_material.md`; page order and titles from `confirmed_outline.md` |
-| Design Intent | [one concise paragraph] |
+| Project Name | <resolved project name> |
+| Canvas Format | <canonical format and dimensions> |
+| Page Count | <exact final count matching §IX> |
+| Target Audience | <confirmed audience> |
+| Communication Intent | <confirmed intent, including priority or sequence> |
+| Desired Audience Outcome | <confirmed observable outcome> |
+| Core Message / Ask / Action | <confirmed core message or ask> |
+| Delivery Context | <confirmed delivery context> |
+| Artifact Afterlife | <confirmed afterlife> |
+| Reading Mode | <text, balanced, presentation, or the active non-PPT equivalent> |
+| Content Strategy | <confirmed material-divergence prose or balanced default> |
+| Design Style | <resolved design direction> |
+| Formula Policy | <mixed, render-all, or text-only> |
+| AI Image Acquisition Path | <confirmed path or not applicable> |
+| Generation Mode | <continuous or split> |
+| Spec Refinement | <enabled or disabled> |
+| Created Date | <YYYY-MM-DD> |
 
 ## II. Canvas Specification
 
 | Property | Value |
 | --- | --- |
-| Dimensions | 1280 × 720 |
-| viewBox | `0 0 1280 720` |
-| Safe Margins | [model decision] |
-| Content Area | [calculated values] |
+| Format | <canonical format name> |
+| Dimensions | <width × height> |
+| viewBox | `<exact viewBox>` |
+| Margins | <safe margins> |
+| Content Area | <usable bounds> |
+```
 
+When a template workspace is active, append exactly one line after the §I table: `- **Template Application**: <confirmed or Strategist-resolved natural-language plan>`. Omit it for free design. Never replace this prose with internal reuse/adherence ids.
+
+### 2.2 Visual, typography, layout, and icons
+
+Use these exact subsections and field shapes:
+
+```markdown
 ## III. Visual Theme
 
-### Narrative and Style
+### Theme Style
 
-- Mode: [preset id or `custom`]
-- Mode behavior: [required only for `custom`]
-- Visual style: [real preset id or `custom`]
-- Visual style behavior: [required only for `custom`; describe shape, density, whitespace, typography character, and texture without HEX]
-- Tone: [teaching tone]
+- **Mode**: <confirmed preset or custom>
+- **Visual style**: <confirmed preset or custom>
+- **Theme**: <resolved identity direction>
+- **Tone**: <resolved tone>
 
 ### Color Scheme
 
-The model selects the palette directly. List only colors that will actually appear in SVG pages.
-
 | Role | HEX | Purpose |
 | --- | --- | --- |
-| Background | `#......` | Main page background |
-| Secondary background | `#......` | Secondary regions |
-| Primary | `#......` | Titles and structural emphasis |
-| Accent | `#......` | Key data and teaching emphasis |
-| Secondary accent | `#......` | Secondary emphasis |
-| Body text | `#......` | Main text |
-| Secondary text | `#......` | Captions and annotations |
-| Border/divider | `#......` | Separators and outlines |
+| Background | <HEX> | <semantic use> |
+| Secondary background | <HEX> | <semantic use> |
+| Primary | <HEX> | <semantic use> |
+| Accent | <HEX> | <semantic use> |
+| Secondary accent | <HEX> | <semantic use> |
+| Body text | <HEX> | <semantic use> |
 
 ## IV. Typography System
 
-All sizes are unitless px numbers. Every recurring semantic role uses one locked size deck-wide.
-
 ### Font Plan
 
-| Role | Font stack | Usage |
+| Role | Chinese | English | Fallback tail |
+| --- | --- | --- | --- |
+| Title | <family> | <family> | <fallback> |
+| Body | <family> | <family> | <fallback> |
+
+- **Title stack**: <complete ordered stack>
+- **Body stack**: <complete ordered stack>
+
+### Font Size Hierarchy
+
+| Purpose | Anchor Size (px) |
+| --- | ---: |
+| Body | <confirmed value> |
+| Title | <confirmed value> |
+| Subtitle | <confirmed value> |
+| Annotation | <confirmed value> |
+
+## V. Layout Principles
+
+### Page Structure
+
+- **Header area**: <rule>
+- **Content area**: <rule>
+- **Footer area**: <rule>
+
+### Spacing Specification
+
+| Element | Current Project |
+| --- | --- |
+| Safe margin | <value> |
+| Content block gap | <value> |
+| Icon-text gap | <value> |
+
+## VI. Icon Usage Specification
+
+- **Primary bundled library**: <one of chunk-filled / tabler-filled / tabler-outline / phosphor-duotone, or none>
+- **Brand-logo library**: <simple-icons when selected for real brand marks; omit otherwise>
+
+| Purpose | Icon Path | Page |
 | --- | --- | --- |
-| Default/body | [PPT-safe stack] | Body content |
-| Title | [PPT-safe stack] | Page and section titles |
-| Emphasis | [PPT-safe stack or same as body] | Quotes and emphasis |
-| Code | [PPT-safe monospace stack] | Code only |
+```
 
-Every stack must end in a PowerPoint-safe installed family such as `Microsoft YaHei`, `SimSun`, `Arial`, `Times New Roman`, or `Consolas`.
+Preserve the confirmed Title/Body system, then add every Strategist-established recurring family override justified by the completed page plan. Append the same semantic role to the Font Plan table and add `- **<Role> stack**: <complete ordered stack>`. Typical optional roles include `Annotation`, `Footer`, `Footnote`, `Data`, `Emphasis`, `Quote`, and `Code`; add only roles that recur and intentionally differ. Add one compact `Role rationale` only when at least one such override is declared; otherwise omit it. The rationale does not become a lock field. Do not collapse distinct Title/Body stacks or discard a declared optional role. Treat every Font Size Hierarchy value as a role anchor: Executor may adjust one occurrence within anchor `±2px`; a short non-structural Hero/Display size may stay unlisted only while the same value is planned at most twice, and its third occurrence needs a named row. Add every recurring palette role and typography-size anchor established by the plan; do not enumerate one-off paint or font-family garnish. For confirmed custom directions, add the applicable `Mode References`, `Mode Behavior`, `Visual Style References`, and `Visual Style Behavior` lines under Theme Style. Include `Stroke Width` under §VI only for a stroke library. `simple-icons` may accompany the one primary bundled library and is recorded only when real brand marks were selected. The icon table records planned usage, but user-provided, template-carried, imported, custom, and other prepared SVGs under the project `icons/` directory remain usable without being forced into that stylistic selection. Leave the §VI table empty when no icons are used.
 
-### Size Roles
+When §VIII contains any `Acquire Via: ai` row, add this subsection under §III and preserve the complete confirmed AI direction:
 
-| Role | Size | Notes |
-| --- | --- | --- |
-| body | [number] | Required baseline |
-| title | [number] | Page title |
-| subtitle | [number] | Subtitle or section lead |
-| annotation | [number] | Chart labels and annotations |
-| footnote | [number] | Page number or source note |
-| [additional recurring role] | [number] | Add when required by the outline |
+```markdown
+### AI Image Strategy
 
-## V. Layout and Rhythm
+- **Image Rendering**: <confirmed preset or custom>
+- **Visual**: <confirmed visual treatment>
+- **Mood**: <confirmed mood and analogy>
+```
 
-### Deck-wide principles
+For a selected custom rendering, also add `Image Rendering Behavior`; add `Image Rendering References` only when the confirmed custom direction actually uses catalog material. Never add a separate image palette.
 
-- [grid and alignment strategy]
-- [whitespace and density strategy]
-- [shape and divider strategy]
-- [how charts, icons, and provided images integrate]
-- [how repetitive card grids are avoided]
+### 2.3 Visualization and image resources
 
-### Page rhythm vocabulary
+Use the §VII table only when at least one real catalog reference is selected. Always keep the §VIII table, including when it has no data rows:
 
-- `anchor`: cover, section node, or final landing page.
-- `dense`: comparisons, data, procedures, or multi-point explanation.
-- `breathing`: one idea, key question, quote, or visual pause.
-- Custom rhythm: allowed when the model names it and writes its executable layout, density, whitespace, and narrative behavior into `spec_lock.md ## rhythm_behaviors`.
-
-Every page must receive exactly one rhythm in `spec_lock.md`.
-
-## VI. Icon System
-
-- Primary library: [one of `chunk-filled`, `tabler-filled`, `tabler-outline`, `phosphor-duotone`, or `none`]
-- Stroke width: [only for `tabler-outline`]
-- Brand library: [`simple-icons` only when a real brand appears, otherwise omit]
-- Approved inventory: [only exact names returned by controlled icon search]
-- Usage rules: [size, color, and semantic consistency]
-
-If icons do not improve comprehension, write `none` and omit the icon lock.
-
+```markdown
 ## VII. Visualization Reference List
 
-Only include pages that actually require a data chart, process diagram, timeline, matrix, framework, or other structured visualization.
+| Page | Template | Usage |
+| --- | --- | --- |
 
-| Page | Visualization | Source facts/data | Template basename | Adaptation plan |
-| --- | --- | --- | --- | --- |
-| P## | [type] | [exact course-material basis] | [real name from `charts_index.json` or `no-template-match`] | [how to render accurately] |
+## VIII. Image Resource List
 
-Never invent a chart template name. `no-template-match` means the model will construct the visualization using native SVG primitives.
+| Filename | Dimensions | Ratio | Purpose | Type | Layout pattern | Crop Policy | Acquire Via | Status | Reference | text_policy | page_role |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+```
 
-## VIII. Confirmed Content Outline
+§VII is an optional page-local reference list. Each row records the page, catalog key, and a short semantic Usage—not geometry. The key derives `templates/charts/<key>.svg`; §IX remains authoritative over final type and realization. Omit an empty §VII and never add path, summary, runners-up, `no-template-match`, or `n/a`. Put unmatched fallbacks in §IX. Legacy wider rows remain readable; new specs use these three columns.
 
-Add one subsection per confirmed page. Keep page number, page order, title, and teaching intent verbatim.
+For every independent data chart or pure text-grid table, add `- **Native-ready**: yes|no` to its §IX Slide block. Choose `yes` only when the confirmed requirement or artifact afterlife benefits from an editable native data object; otherwise use `no`. Conceptual visualizations and incidental sparklines, KPI trends, or insets omit this field and remain ordinary SVG.
 
-### Slide 01 - [confirmed title]
+In §VIII, author every planned or explicitly required resource from the confirmed source boundary. Copy the selected `Layout pattern` id/name and modifiers verbatim; set `Crop Policy` to `adaptive` or `no-crop`; set `Acquire Via` to `ai`, `web`, `user`, `formula`, `placeholder`, or `slice`. Preserve unresolved required assets as `Pending` or `Needs-Manual` instead of dropping or reclassifying them.
 
-- Teaching intent: [confirmed intent]
-- Core message: [one assertion sentence]
-- Rhythm: `anchor` / `dense` / `breathing`
-- Layout: [specific composition: name the major regions, their relationship, visual focal point, and whitespace; copy this intent into the matching `deck_manifest.slides[].layout`]
-- Content blocks: [fully expanded content based on course material]
-- Visualization: [real chart basename, `native-svg`, or `none`]
-- Icons: [approved icon names or `none`]
-- Transition: [connection to next confirmed page]
+### 2.4 Complete page roster and notes
 
-Repeat until every confirmed page is represented exactly once.
+Write one ordered Slide block per page. Slide count and order must equal §I `Page Count`; `Content` is a complete page brief, not a skeleton.
 
-Every per-slide `Layout` is an execution contract, not commentary. The matching `deck_manifest.slides[].layout` must carry the same composition intent so an isolated Executor can implement it without reading this file.
+```markdown
+## IX. Content Outline
 
-## IX. Speaker Notes Requirements
+### Part 1: <section name>
 
-`notes/total.md` must contain one section per page in the same order, including:
+#### Slide 01 - <page name>
 
-- explanation emphasis;
-- transition sentence;
-- optional classroom question or teaching reminder when appropriate.
+- **Audience move**: <audience state before → after>
+- **Layout**: <composition; include the chosen prototype when template-active>
+- **Title**: <preferred page title>
+- **Core message**: <one governing assertion>
+- **Content**: <complete intended on-slide content and hierarchy>
 
-## X. Technical Constraints Reminder
+## X. Speaker Notes Requirements
 
-1. SVG uses `xmlns="http://www.w3.org/2000/svg"` and `viewBox="0 0 1280 720"`.
-2. Text wrapping uses `<tspan>`; `foreignObject`, `<style>`, classes, scripts, animation, iframe, `textPath`, and `@font-face` are forbidden.
-3. Colors and fonts must come from `spec_lock.md`; `rgba()` is forbidden.
-4. Images are not supported: do not write `<image>`, image contracts, image fields, image paths, remote URLs, data URIs, or `asset://`.
-5. Icons use `<use data-icon="library/name" .../>` and must exist in the locked inventory.
-6. Arbitrary `<use href>` and fabricated resource names are forbidden.
-7. `svg_output/` is the native editable PPTX source; `svg_final/` is the self-contained preview source.
+- **Filename**: match each SVG filename under `notes/`
+- **Content**: <notes content and source-handling policy>
+- **Total duration**: <resolved duration>
+- **Notes style**: <formal, conversational, interactive, or resolved equivalent>
+- **Presentation purpose**: <inform, persuade, inspire, instruct, report, or resolved combination>
+```
+
+Add `Visualization` and `Images` to a Slide block when it consumes §VII/§VIII rows or uses a page-local visualization. State whether `Visualization` is data-driven when source values determine geometry; this page-level declaration remains authoritative even when no catalog reference fits. Add `Native-ready: yes|no` only for independent data charts or pure text-grid tables. Add `Fact IDs` for sourced claims and `Data class: scenario` for invented demo values. Add `Cover impact` to P01 except on preservation paths; add `Closing impact` only when the final page genuinely resolves the deck. Roster ids/count/order and final content are authoritative. Image patterns preserve their selected semantic composition; chart rows only offer page-local references. Executor owns geometry, hierarchy, treatment, and sparse local garnish.
+
+For free-design pages, describe `Layout` through relationships, hierarchy, regions, and column spans; do not prescribe element-level `x`, `y`, `width`, or `height` or duplicate the global geometry in §II/§V. Exact coordinates belong to Executor SVG authoring. Preserve literal geometry only when the user explicitly requires it or a mirror/template preservation contract owns it.
+
+---
+
+## 3. Machine validation
+
+```bash
+python3 skills/ppt-master/scripts/project_manager.py validate <project_path>
+```
+
+Validation reads the Markdown directly. It reports missing or out-of-order I–X sections, unresolved `[fill...]` placeholders, missing per-slide `Audience move`, and a missing §III `AI Image Strategy` when an §VIII table selects `ai` acquisition.
+
+The schema validates structure only. Strategist role modules own field meaning, recommendation logic, page planning, image policy, and template policy. `spec_lock.md` owns stable execution anchors and routing selected in context; it is not an exhaustive value projection. On divergence, repair the Design Spec from the retained final state when Gate 1 fails, then re-author affected lock anchors from the audited Design Spec and current context. Never reopen `result.json` merely to author or validate the lock, and never use the lock to overwrite a valid Design Spec decision.

@@ -1,37 +1,87 @@
-# Artifact Ownership Specification（应用运行版）
+# Artifact Ownership Specification
 
-每类事实只从一个拥有者读取，不得建立第二份互相漂移的真源。
+Global artifact ownership rules for PPT Master projects.
 
-## Ownership Matrix
+**Hard rule**: Read each fact from its owning artifact. Do not merge multiple channels into a second source of truth.
 
-| Artifact | Owns | Contract |
-| --- | --- | --- |
-| `sources/course_material.md` | 课程事实、数据、案例和术语 | Strategist 与 Executor 的唯一内容事实来源 |
-| `confirmed_outline.md` | 页数、页码、页序、页标题、教学意图 | 不得增删、合并、拆分、重排或改写标题 |
-| `design_spec.md` | 人类可读的整体设计叙事和逐页内容展开 | Strategist 写，后续角色读 |
-| `spec_lock.md` | 颜色、字体、图标、节奏和图表的字面执行值 | Executor 每页开始前重读；与设计叙事冲突时本文件优先 |
-| `deck_manifest.json` | 与确认大纲一一对应的页面执行清单，包含每页具体 `layout` | 页面数量、顺序和版式意图不得变化 |
-| `templates/charts/` | 可用图表模板 | 只能使用索引中真实存在的模板 basename |
-| `templates/icons/` | 可用图标文件 | 只能使用受控搜索返回并写入锁的真实文件 |
-| `svg_output/` | 大模型逐页生成的作者源 | 质量检查和原生 DrawingML PPTX 读取此目录 |
-| `notes/total.md` | 全部讲者备注的作者源 | 页面数量和顺序必须与 deck manifest 一致 |
-| `notes/slide_*.md` | 拆分后的逐页备注 | 由 `total_md_split.py` 从 `notes/total.md` 派生 |
-| `svg_final/` | 图标和教师原图已内嵌的自包含预览 | 由 `finalize_svg.py` 从 `svg_output/` 重建，不在此目录直接修页 |
-| `exports/` | 最终 PPTX | 由 `svg_to_pptx.py` 固定参数导出 |
+---
 
-## Invariants
+## 1. Ownership Matrix
 
-- 内容事实只来自 `course_material.md`，页面边界只来自 `confirmed_outline.md`。
-- `design_spec.md` 解释设计；`spec_lock.md` 执行设计。
-- `svg_output/` 是唯一页面作者源；任何修复都先改这里，再重新生成 `svg_final/` 和 PPTX。
-- `svg_final/` 是可丢弃派生物，必须能够完全重建。
-- 原生 PPTX 从 `svg_output/` 导出；网页预览从 `svg_final/` 读取。
-- 应用运行 Python；Agent 不执行 Shell、网络、浏览器或图片工具。
+| Artifact | Owner | Role | Read/write contract |
+|---|---|---|---|
+| `sources/` content-type files | Content contract | Main pipeline factual/text origin for tables, chart data values, SmartArt node wording, and presentation content | Strategist reads content-type files (`.md` / `.markdown` / `.txt` / `.csv` / `.tsv` / `.json` / `.jsonl` / `.yaml` / `.yml`), judges by content, and resolves approved on-slide wording into §IX. Executor opens source passages only for explicit verification/resolution; do not replace values with PPTX geometry JSON in the main pipeline. |
+| `sources/*.facts.json` | Fact provenance contract | Stable external `fact_id` → claim/source mapping created by topic research | Strategist cites IDs in §IX; Executor resolves them for visible footnotes / natural notes attribution. Scenario data never enters this file. |
+| `sources/` converted-source originals | Source archive | Imported source files that have a converted content contract (`.pdf` / `.pptx` / `.docx` / `.xlsx` / `.html` / `.epub` / `.tex` / `.rst` / `.ipynb` / `.typ`, etc.) and source-adjacent extracted assets | Read via the converted `<stem>.md` in the main pipeline; direct-PPTX workflows read the `.pptx` by route |
+| `sources/*.conversion_profile.json`, `sources/*_files/image_manifest.json` | Pipeline sidecar | Conversion audit record / asset index | NOT read as slide content; open only to audit a conversion or resolve assets |
+| `analysis/source_profile.json` | Machine fact index | Compact Strategist-facing PPTX intake digest | Main pipeline reads as factual context and recommendation candidates |
+| `analysis/<stem>.identity.json` | Native deck identity facts | Canvas, theme palette/fonts, observed usage | Read selectively when detailed identity facts are needed |
+| `analysis/<stem>.slide_library.json` | Native PPTX structure facts | Text slots, geometry, native tables, native chart caches, SmartArt nodes/connections | Direct PPTX workflows use as native fill/structure contract |
+| `analysis/image_analysis.csv` | Regenerated image fact view | Measured facts about the current `images/` folder | Re-run `analyze_images.py` before reading image facts after changes |
+| `design_spec.md` | Strategist design authority | Human-readable design intent, page brief, rationale, resources, and production mechanics | Consume final confirmation once, write/audit here, and apply enabled refinement to this same artifact. After Gate 1 plus conditional approval, later roles read it instead of `result.json`; §IX owns Executor page content. |
+| `spec_lock.md` | Execution anchor and routing contract | Machine-readable stable color/type roles, icons, images, page rhythm, charts, `template_reuse_scope`, and the route's PowerPoint structure mode; mirror/layout template routes additionally own input prototypes, the Master roster, and the complete page-to-Master/Layout mapping | Strategist authors the route-specific anchors from the audited Design Spec plus current project/page/template context. Executor retains the complete lock once per valid execution context; local uncertainty consults that retained copy before the owning Design Spec fragment. Sparse page-local color/font garnish needs no lock row; a recurring semantic role or new adaptive Layout identity requires Strategist repair before reuse. |
+| `project_manager.py page-context` stdout | Derived on-demand page context | Read-only model-facing anchor set + current-page delta + fingerprints for large references | Use only for explicit diagnostics/telemetry or an unresolved page/template/chart path-SHA projection. Never edit or persist it as a replacement source of truth, and never run it as a routine pre-page gate. `global` is a bounded anchor set, not a whitelist. `reference_set` carries path/SHA/load policy but never appends reference payloads. |
+| `analysis/page-context/P<NN>.usage.json` | Derived optional context telemetry | Measured on-demand page-context size plus hashes of owning inputs/references | `page-context --record-usage` deterministically replaces only the invoked page's snapshot; `page-context-report` summarizes existing snapshots. Telemetry may be partial. Use token data to evaluate context cost, never as content or an execution contract. |
+| `images/` | Runtime image pool | User, extracted, AI, web, formula, slice, EMF/WMF assets | Step 5 writes here; `analysis/image_analysis.csv` derives from current contents |
+| `icons/` | Prepared project icon pool | Bundled icons copied by `icon_sync.py` plus user-provided, template, imported, or custom icon SVGs | Executor may use any icon in this project-local pool; `spec_lock.icons.inventory` records planned bundled choices rather than an exhaustive whitelist. Exporter global fallback is legacy compatibility only. |
+| `templates/` | Project template reference | Step 3 imported specs, template SVGs, and non-image assets | Strategist reads the template Design Spec and actual SVG roster during planning. Continuous Executor reuses that context; fresh Executor reads the Design Spec once and each selected complete SVG only before first use or after its SHA changes. |
+| `templates/template_execution_manifest.json` (`v1`) + `templates/template_execution/*.text-slots.json` (`v2-min`) | Derived template index | Compact prototype/source-import summary plus per-prototype text-slot diagnostics; the sidecar integrity hash is tool-only | Materialization may publish these deterministic records, but page-context does not inject or require them and models do not read them during page authoring. The complete prototype SVG is the sole visual/template authority; never author from either JSON artifact. |
+| `<import_workspace>/svg/` | Imported native-payload backing | Complete PPTX-derived metadata, hidden carriers, fallback evidence, and source structure | Keep immutable; create-template materialization may resolve a validated source ref against these files, but models do not edit or bulk-read them |
+| `<import_workspace>/svg-flat/` | Optional complete-page verification backing | Self-contained visual composition generated only by explicit `--inheritance-mode both` | Keep immutable when requested; never use as authoring or materialization input |
+| `<import_workspace>/authoring-svg/` | Template-creation author source | Layered editable SVG IR for imported Master, Layout, and Slide objects | Template_Designer reads and edits this bundle; final template SVGs are materialized from it rather than copied from lossless backing |
+| `<import_workspace>/authoring-svg/authoring_summary.json` | Model-readable authoring index | Current SVG roster plus compact per-file canvas, size, text, image, vector, placeholder, and source-ref counts | Models read this before authoring SVGs; regenerate after direct IR edits |
+| `<import_workspace>/authoring-svg/authoring_manifest.json` | Tool-only authoring provenance contract | Per-document source/authoring hashes and document-local source-ref paths | Generated atomically with the IR; materialization validates it before reusing native payload; never load it into model context or duplicate raw payload here |
+| `<import_workspace>/authoring-svg-flat/` | Optional complete-page verification IR | Self-contained page composition view with its own summary and provenance manifest | Generate only from an explicitly requested `svg-flat/`; use to verify composition, while layered `authoring-svg/` remains the canonical editable source |
+| `<import_workspace>/icons/imported/` | Imported vector pool | One canonical copy of every factored vector subtree | Authoring SVGs reference `data-icon="imported/<name>"`; vector inventories retain source refs so expansion re-establishes IR identity |
+| `confirm_ui/recommendations.stage1.json`, `.stage2.json`, `.stage3.json` | Confirmation proposals | One Strategist-authored payload per confirmation stage | Confirm UI selects the active file from `result.json`. The active, unconfirmed stage may be overwritten when the user requests a new recommendation; normal progression writes the next stage file and leaves confirmed earlier stages intact. Legacy `recommendations.json` is read only when no stage-specific file exists. |
+| `confirm_ui/result.json` | Confirmation result | Persisted user-confirmed input evidence | Generate Step 4 reads the final object once into active context; Strategist consumes it completely into `design_spec.md`. Normal downstream work does not reopen it; fresh recovery may read it once when no retained final state exists. |
+| `svg_output/` | Page-design author source | Main-agent handwritten SVG pages containing the complete visible design | Quality checker and native PPTX export read this as the canonical visual/page-layout source; templates and locks do not add missing visible objects at export |
+| `notes/total.md` | Speaker-note source | Complete notes before splitting | Step 6 writes; Step 7.1 splits |
+| `notes/slide_*.md` | Split notes | Per-slide notes generated from `total.md` | Derived by `total_md_split.py` |
+| `svg_final/` | Derived visual preview | Self-contained post-processed SVGs that may be opened directly or inserted as SVG pictures | Rebuild from `svg_output/` with `finalize_svg.py`; do not use as a supported PPTX source |
+| `validation/svg_quality_report.json` | Quality provenance | Final SVG gate split into blocking / introduced / inherited / source-import categories, bound to the checked SVG bytes by SHA-256 | `svg_quality_checker.py --stage final --json` writes before export; the exporter reads it programmatically and links it only when the export-source fingerprint matches. Agents use successful command output and do not load the full JSON except for targeted failure/audit reads. |
+| `validation/<output_stem>.report.json` | Published-package audit | PPTX package/resource postflight status, part counts, and quality-gate linkage | Step 7.3 writes after the PPTX passes package validation and emits a compact `[POSTFLIGHT]` receipt. Agents use the receipt on routine success and keep the full JSON cold unless targeted failure/audit evidence is required. |
+| `exports/` | Delivery artifacts | Native DrawingML PPTX and explicit native-object/narration variants | Step 7.3 writes only final deliverables from `svg_output/`. |
+| `backup/<timestamp>/svg_output/` | Frozen author-source archive | Re-export source without re-running LLM | `svg_to_pptx.py` writes a snapshot during export |
+| `animations.json` | Optional animation config | Object-level animation sidecar | Created only by explicit animation workflow/request |
 
-## Regeneration
+---
 
-| Derived artifact | Regenerate from | Application command |
-| --- | --- | --- |
-| `notes/slide_*.md` | `notes/total.md` | `total_md_split.py` |
-| `svg_final/` | `svg_output/` and local assets | `finalize_svg.py` |
-| Native PPTX | `svg_output/`, notes, and local assets | `svg_to_pptx.py` |
+## 2. Ownership Invariants
+
+| Invariant | Rule |
+|---|---|
+| Content authority | Content-type files in `sources/` (`.md` / `.markdown` / `.txt` / `.csv` / `.tsv` / `.json` / `.jsonl` / `.yaml` / `.yml`) own the factual/text origin for main-pipeline content, tables, chart values, and SmartArt node wording; Strategist resolves approved on-slide wording into §IX. Executor renders §IX and opens sources only for explicit verification/resolution, never to draft a second outline. `slide_library.json` does not own content values. |
+| Sources read policy | In `sources/`, read content-type files (`.md` / `.markdown` / `.txt` / `.csv` / `.tsv` / `.json` / `.jsonl` / `.yaml` / `.yml`) and judge by content — a `.json` / `.csv` may be core content or just data. Exclude known sidecars: `*.conversion_profile.json` and `*_files/image_manifest.json`. `analysis/` facts (`source_profile.json`, `<stem>.slide_library.json`) are read per Step 4 / direct-PPTX workflow, not in the `sources/` content scan. |
+| PPTX structure | `slide_library.json` owns native geometry, slot facts, and SmartArt layout/relationships for direct PPTX workflows. |
+| Design contract | Final confirmation once → audited `design_spec.md` → optional same-file refinement/approval → context-authored lock. Never maintain a parallel draft/lock. Executor may apply `Template Application` prose but never replace identity. Repair divergence from the approved Design Spec/context unless it fails active-decision fidelity. |
+| Flat packaging authority | Free-design, brand-only, and `template_reuse_scope: style` declare `pptx_structure.mode: flat` and omit `pptx_masters`, `pptx_layouts`, `page_pptx_layouts`, and `page_layouts`. `svg_output/` owns the complete Slide-local visual design without root Master/Layout identity, fixed-layer ownership, or placeholder metadata. Export materializes one clean project-owned Master plus one Blank Layout, applies the locked theme defaults, removes stock content placeholders/Layout inventory, and retains only the standard date/footer/slide-number capability hooks. |
+| Template structure authority | `template_reuse_scope: mirror|layout` uses `page_layouts` for each page's authoring-input prototype. `pptx_masters` / `pptx_layouts` own the unique reusable output definitions, while `page_pptx_layouts` owns page assignment. Strict keeps the prototype contract; adaptive may use a current or new Layout already declared by Strategist. A construction-discovered structural change returns upstream for definition and assignment repair before authoring resumes. Mirror additionally preserves literal visuals/text topology; layout allows project-controlled reflow/re-skinning. Unused definitions may register without a published Slide. Templates validate provenance but never add missing visible page objects during export. |
+| Fact classes | External facts resolve through `sources/*.facts.json`; invented demo KPIs/targets/internal ratios are labeled `scenario` in `design_spec.md §IX` and visibly in the page. Never promote scenario data into the external fact registry. |
+| Imported-template authoring | Editable SVGs under `authoring-svg/` own create-template edits, `authoring_summary.json` owns model-facing orientation, and `authoring_manifest.json` owns tool-only source-object identity. Lossless `svg/` owns immutable native payload and fallback evidence; optional `svg-flat/` owns only complete-page verification. Materialized `templates/*.svg` own the validated deliverable contract and contain no IR-only source refs. |
+| Legacy template input | Old unmapped/distilled/preserve structured projects and incomplete template packages are not migrated in place. [`create-template`](../workflows/create-template.md) authors a new current workspace: original PPTX Type A may preserve existing native topology in mirror; legacy SVG-only Type B is visual reference for `standard` / `fidelity`. An intentional free-design or brand-only `flat` project is already current. The exporter does not migrate or visually cluster legacy structure. |
+| Image facts | `images/` is live state; `analysis/image_analysis.csv` is a regenerated view, not a durable cache. |
+| SVG source | `svg_output/` is the only author source for generated pages. |
+| Page-design closure | On SVG-authoring routes, every visible exported-slide object exists in the corresponding page SVG or an explicitly referenced visual asset. |
+| Package-behavior separation | Speaker notes, animations, transitions, narration, and direct native-PPTX workflows keep their owning artifacts; do not force them into SVG metadata. |
+| Post-processed SVG | `svg_final/` is disposable, must be rebuilt in Step 7.2, and serves only as a self-contained visual preview / manually insertable SVG picture. |
+| Export source | The only supported generated-PPTX route reads `svg_output/` through the project SVG-to-DrawingML converter. A diagnostic `-s final` override does not change ownership or create a supported release route. |
+| Shape-conversion boundary | PowerPoint's manual Convert-to-Shape operation on `svg_final/` is outside the project compatibility contract. |
+| Confirmation | Final UI/chat confirmation overrides recommendations and is consumed once into `design_spec.md`. Enabled refinement applies arbitrary revisions there and requires approval; only then may active-decision fidelity release lock authoring. |
+
+**Forbidden - mixed ownership**: Do not copy chart values from Markdown into `analysis/` by hand, do not edit `svg_final/` as the source of a fix, do not edit imported lossless SVGs instead of their authoring IR, and do not treat `design_spec.md` prose as a replacement for `spec_lock.md`.
+
+---
+
+## 3. Regeneration Rules
+
+| Derived artifact | Regenerate from | Command / owner |
+|---|---|---|
+| `analysis/image_analysis.csv` | Current `images/` | `python3 ${SKILL_DIR}/scripts/analyze_images.py <project_path>/images` |
+| `<import_workspace>/authoring-svg/authoring_summary.json` | Current authoring SVGs plus tool-only manifest roster | `python3 ${SKILL_DIR}/scripts/svg_authoring_view.py <import_workspace>/authoring-svg --refresh-summary`; in-place vector/picture extraction refreshes it automatically |
+| `notes/slide_*.md` | `notes/total.md` | `python3 ${SKILL_DIR}/scripts/total_md_split.py <project_path>` |
+| `svg_final/` | `svg_output/` plus project assets | `python3 ${SKILL_DIR}/scripts/finalize_svg.py <project_path>` |
+| `validation/svg_quality_report.json` | `svg_output/`, locks, template provenance | `python3 ${SKILL_DIR}/scripts/svg_quality_checker.py <project_path> --stage final --json` |
+| Native PPTX + `validation/<output_stem>.report.json` | `svg_output/` plus notes/assets and final quality report | `python3 ${SKILL_DIR}/scripts/svg_to_pptx.py <project_path>` |
+
+**Default - regenerate derived views**: When a source artifact changes, regenerate the derived artifact at the owning step instead of patching the derived file directly.
