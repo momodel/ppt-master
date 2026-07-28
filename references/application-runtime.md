@@ -38,6 +38,8 @@
 - 课程事实只能来自 `sources/course_material.md`。
 - `deck_manifest.json.slides` 必须逐项对应确认大纲，每页 `layout` 必须完整承接 `design_spec.md` 对该页规划的构图、区域关系、视觉焦点与留白。
 - `spec_lock.md ## layout` 必须包含 `principles` 和 `variation`：前者锁定全局网格、对齐、形状与留白原则，后者约束跨页构图变化，避免相邻页面机械重复。
+- `spec_lock.md ## pptx_structure` 必须写 `mode: flat`；不写 structured 映射段。
+- `spec_lock.md ## canvas` 必须同时写 `viewBox` 和 `format`（如 PPT 16:9）。
 
 ## 跨页构图多样性
 
