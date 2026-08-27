@@ -1,0 +1,36 @@
+{
+  "id": "shangwu-baogao-v1",
+  "title": "商务报告 · 深色专业风",
+  "description": "深色底金色强调的结构化汇报模板：KPI 面板、对比矩阵与流程时间线，适合数据驱动的分析汇报。",
+  "styleId": "consulting-decision",
+  "layoutPack": "report_core",
+  "sourceCommit": "ebd74d1f2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f",
+  "rhythmPattern": [
+    "anchor",
+    "dense",
+    "dense",
+    "breathing",
+    "anchor"
+  ],
+  "pageTypes": [
+    "封面页",
+    "目录页",
+    "内容页",
+    "数据页",
+    "对比页",
+    "结论页"
+  ],
+  "iconRefs": [
+    "phosphor-duotone/chart-bar",
+    "phosphor-duotone/trend-up",
+    "phosphor-duotone/target",
+    "phosphor-duotone/magic-wand",
+    "phosphor-duotone/warning",
+    "phosphor-duotone/check-circle"
+  ],
+  "subjects": [
+    "商务",
+    "汇报",
+    "通用"
+  ]
+}

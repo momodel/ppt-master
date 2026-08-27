@@ -1,0 +1,35 @@
+{
+  "id": "renwen-xushi-v1",
+  "title": "人文叙事 · 暖色纸质风",
+  "description": "米色纸质底衬与衬线标题的温和叙事模板：大留白、引文排版与双栏对照，适合文学、历史与通识讲解。",
+  "styleId": "narrative-keynote",
+  "layoutPack": "editorial_bleed",
+  "sourceCommit": "ebd74d1f2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f",
+  "rhythmPattern": [
+    "anchor",
+    "breathing",
+    "dense",
+    "breathing",
+    "anchor"
+  ],
+  "pageTypes": [
+    "封面页",
+    "目录页",
+    "内容页",
+    "引用页",
+    "对照页",
+    "结语页"
+  ],
+  "iconRefs": [
+    "phosphor-duotone/book-open",
+    "phosphor-duotone/quotes",
+    "phosphor-duotone/book-open-text",
+    "phosphor-duotone/map-pin",
+    "phosphor-duotone/calendar-blank"
+  ],
+  "subjects": [
+    "人文",
+    "通识",
+    "叙事"
+  ]
+}

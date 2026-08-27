@@ -1,0 +1,18 @@
+{
+  "id": "ketang-hudong-v1",
+  "title": "课堂互动 · 活力教学风",
+  "description": "明快对比色与圆角卡片的互动教学模板：提问驱动、小组讨论与即时反馈，适合课堂讨论与实训指导。",
+  "styleId": "workshop-teaching",
+  "layoutPack": "presentation_core",
+  "sourceCommit": "ebd74d1f2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f",
+  "rhythmPattern": ["anchor", "breathing", "dense", "breathing", "anchor"],
+  "pageTypes": ["封面页", "目录页", "提问页", "讨论页", "练习页", "总结页"],
+  "iconRefs": [
+    "phosphor-duotone/hand-pointing",
+    "phosphor-duotone/users-three",
+    "phosphor-duotone/magic-wand",
+    "phosphor-duotone/check-circle",
+    "phosphor-duotone/brain"
+  ],
+  "subjects": ["课堂", "互动", "实训"]
+}

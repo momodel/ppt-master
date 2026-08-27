@@ -1,0 +1,12 @@
+{
+  "id": "shuxue-jihe-v1",
+  "title": "数学几何 · 蓝白推演风",
+  "description": "蓝白坐标网格、清晰推演层级与醒目的结论色，适合数学、统计和工程课程。",
+  "styleId": "math-geometric",
+  "layoutPack": "presentation_core",
+  "sourceCommit": "self-authored-20260827",
+  "rhythmPattern": ["anchor", "dense", "breathing", "dense", "anchor"],
+  "pageTypes": ["封面页", "目录页", "概念页", "推导页", "图解页", "对比页", "总结页"],
+  "iconRefs": [],
+  "subjects": ["数学", "统计", "理工", "工程"]
+}

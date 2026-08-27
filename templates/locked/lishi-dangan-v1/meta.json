@@ -1,0 +1,12 @@
+{
+  "id": "lishi-dangan-v1",
+  "title": "历史档案 · 编辑叙事风",
+  "description": "米白纸面、朱红索引与深墨正文，适合历史、人文案例和时间线叙事。",
+  "styleId": "archive-editorial",
+  "layoutPack": "editorial_bleed",
+  "sourceCommit": "self-authored-20260827",
+  "rhythmPattern": ["anchor", "breathing", "dense", "breathing", "anchor"],
+  "pageTypes": ["封面页", "目录页", "章节页", "叙事页", "时间线页", "引用页", "总结页"],
+  "iconRefs": [],
+  "subjects": ["历史", "近现代史", "人文", "思政", "通识"]
+}

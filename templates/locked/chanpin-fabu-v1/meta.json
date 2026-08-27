@@ -1,0 +1,17 @@
+{
+  "id": "chanpin-fabu-v1",
+  "title": "产品发布 · 深空展示风",
+  "description": "深空黑底配品牌色渐变的发布会模板：全幅 hero 展示、特性卡片与对比面板，适合课程成果展示与项目路演。",
+  "styleId": "product-launch",
+  "layoutPack": "editorial_bleed",
+  "sourceCommit": "ebd74d1f2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f",
+  "rhythmPattern": ["anchor", "breathing", "dense", "breathing", "anchor"],
+  "pageTypes": ["封面页", "目录页", "展示页", "特性页", "对比页", "结尾页"],
+  "iconRefs": [
+    "phosphor-duotone/rocket-launch",
+    "phosphor-duotone/star",
+    "phosphor-duotone/sparkle",
+    "phosphor-duotone/thumbs-up"
+  ],
+  "subjects": ["产品", "路演", "展示"]
+}

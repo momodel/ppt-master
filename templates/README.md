@@ -10,6 +10,7 @@ inheritance hierarchy.
 | [`brands/`](./brands/) | Identity: color, typography, logo, voice, icon style | Page structure or SVG roster | [`brands_index.json`](./brands/brands_index.json) |
 | [`layouts/`](./layouts/) | Brand-neutral structure: canvas, Master/Layout graph, page types, slots, SVG roster | Brand identity or a recurring communication application | [`layouts_index.json`](./layouts/layouts_index.json) |
 | [`decks/`](./decks/) | A recurring presentation family: application contract + integrated identity + structure | — | [`decks_index.json`](./decks/decks_index.json) |
+| [`locked/`](./locked/) | Accepted frozen design contracts (edu app): identity + structure + rhythm fixed at ingestion, applied verbatim at generation | Free design or per-deck visual rework | per-template `meta.json` (see [`references/locked-template-contract.md`](../references/locked-template-contract.md)) |
 
 A brand is not “a layout minus its pages”: it owns a different segment. Use a
 brand for identity with free page composition, a layout for brand-neutral
