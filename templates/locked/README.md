@@ -4,7 +4,7 @@
 
 ## 使用方式
 
-选择、落盘与适配规则由 [`references/locked-template-contract.md`](../references/locked-template-contract.md) 定义：第一层（主 Agent）按规则选模板并逐字落盘，第二层（页面 Worker）按落盘后的 `spec_lock.md` 执行。应用代码不做模板选择与节奏适配。
+选择、落盘与适配规则由 [`references/locked-template-contract.md`](../references/locked-template-contract.md) 定义：**应用**在 Agent 启动前按规则确定性选模板并逐字落盘（#122 直出，无模型调用），主 Agent 只读已落盘合同并做逐页版式映射，第二层（页面 Worker）按落盘后的 `spec_lock.md` 执行。
 
 ## 每套文件
 
